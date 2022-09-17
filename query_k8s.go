@@ -54,7 +54,11 @@ func isFilteringEnabled(filterFlag string) bool {
 
 func getImages(allImages *map[string]ImageData, ctx *cli.Context, clientset *kubernetes.Clientset) {
 
-	var namespaces = filterNamespaces(ctx, clientset)
+	var allNamespaces = getAllNamespaces(clientset)
+
+	filterFlag := ctx.String(filterNamespaceAnnotationFlag.Name) // ToDo: Error Handling not correct value for flag
+
+	var namespaces = filterNamespaces(filterFlag, allNamespaces)
 
 	// iterate over the filtered namespaces
 	for _, namespace := range namespaces {
@@ -118,33 +122,45 @@ func getImages(allImages *map[string]ImageData, ctx *cli.Context, clientset *kub
 	}
 }
 
-func filterNamespaces(ctx *cli.Context, clientset *kubernetes.Clientset) map[string]corev1.Namespace {
-	var result = make(map[string]corev1.Namespace)
-
-	//get all namespaces
+func getAllNamespaces(clientset *kubernetes.Clientset) *corev1.NamespaceList {
 	namespaces, err := clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		panic(err.Error())
 	}
+	return namespaces
+}
 
-	// get the filter flag value
-	filterFlag := ctx.String(filterNamespaceAnnotationFlag.Name) // ToDo: Error Handling not correct value for flag
+func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) map[string]corev1.Namespace {
+	var result = make(map[string]corev1.Namespace)
 
 	if !isFilteringEnabled(filterFlag) {
-		for _, namespace := range namespaces.Items {
+		for _, namespace := range allNamespaces.Items {
 			result[namespace.Name] = namespace
 		}
 	} else {
+		var filterFlagAnnotationKey string
+		var filterFlagAnnotationValue string
 
-		filterFlagAnnotationKey := strings.Split(filterFlag, "=")[0]
-		filterFlagAnnotationValue := strings.Split(filterFlag, "=")[1]
+		if strings.Contains(filterFlag, "=") {
+			filterFlagAnnotationKey = strings.Split(filterFlag, "=")[0]
+			filterFlagAnnotationValue = strings.Split(filterFlag, "=")[1]
+			log.Debugf("Filtering namespaces for annotation with key '%s' and value '%s'", filterFlagAnnotationKey, filterFlagAnnotationValue)
+		} else {
+			filterFlagAnnotationKey = filterFlag
+			log.Debugf("Filtering namespaces for annotation with key '%s'", filterFlagAnnotationKey)
+		}
 
-		log.Debugf("Filtering namespaces for annotation with key '%s' and value '%s'", filterFlagAnnotationKey, filterFlagAnnotationValue)
-
-		// get labels for each namespace
-		for _, namespace := range namespaces.Items {
+		// iterate over all namespaces and check annotations
+		for _, namespace := range allNamespaces.Items {
 
 			if value, ok := namespace.Annotations[filterFlagAnnotationKey]; ok {
+
+				//when filtering only for existence of key
+				if filterFlagAnnotationValue == "" {
+					// then add the namespace object to the global map
+					result[namespace.Name] = namespace
+				}
+
 				// and the value of the annotation is equal the value specified
 				if value == filterFlagAnnotationValue {
 					// then add the namespace object to the global map
