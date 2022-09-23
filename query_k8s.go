@@ -70,55 +70,7 @@ func getImages(allImages *map[string]ImageData, ctx *cli.Context, clientset *kub
 		log.Debugf("There are %d pods in the namespace %s", len(pods.Items), namespace.Name)
 
 		//iterate over all pods and their images and add to result set
-		for _, pod := range pods.Items {
-
-			//first the initContainers array
-			initContainers := pod.Spec.InitContainers
-			for _, initContainer := range initContainers {
-				value, exists := (*allImages)[initContainer.Image] //check if image is already in result set
-				if !exists {                                       // when not add ImageData struct with initial RunLocation
-					(*allImages)[initContainer.Image] = ImageData{
-						Image: initContainer.Image,
-						Running: []FindingData{
-							FindingData{
-								Namespace: pod.Namespace,
-								Pod:       pod.Name,
-							},
-						},
-					}
-				} else { // when found add only the informationen where this image is used
-					value.Running = append(value.Running, FindingData{
-						Namespace: pod.Namespace,
-						Pod:       pod.Name,
-					})
-					(*allImages)[initContainer.Image] = value
-				}
-			}
-
-			// second the containers array
-			containers := pod.Spec.Containers
-			for _, container := range containers {
-				_, ok := (*allImages)[container.Image]
-				if !ok {
-					(*allImages)[container.Image] = ImageData{
-						Image: container.Image,
-						Running: []FindingData{
-							FindingData{
-								Namespace: pod.Namespace,
-								Pod:       pod.Name,
-							},
-						},
-					}
-				} else {
-					value, _ := (*allImages)[container.Image]
-					value.Running = append(value.Running, FindingData{
-						Namespace: pod.Namespace,
-						Pod:       pod.Name,
-					})
-
-				}
-			}
-		}
+		addImageData(allImages, pods)
 	}
 }
 
@@ -177,6 +129,61 @@ func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) ma
 		}
 	}
 	return result
+}
+
+func addImageData(allImages *map[string]ImageData, pods *corev1.PodList) {
+
+	//iterate over all pods and their images and add to result set
+	for _, pod := range pods.Items {
+
+		//first the initContainers array
+		initContainers := pod.Spec.InitContainers
+		for _, initContainer := range initContainers {
+			value, exists := (*allImages)[initContainer.Image] //check if image is already in result set
+			if !exists {                                       // when not add ImageData struct with initial RunLocation
+				(*allImages)[initContainer.Image] = ImageData{
+					Image: initContainer.Image,
+					Findings: []FindingData{
+						{
+							Namespace: pod.Namespace,
+							PodName:   pod.Name,
+						},
+					},
+				}
+			} else { // when found add only the informationen where this image is used
+				value.Findings = append(value.Findings, FindingData{
+					Namespace: pod.Namespace,
+					PodName:   pod.Name,
+				})
+				(*allImages)[initContainer.Image] = value
+			}
+		}
+
+		// second the containers array
+		containers := pod.Spec.Containers
+		for _, container := range containers {
+			value, exists := (*allImages)[container.Image]
+			if !exists {
+				(*allImages)[container.Image] = ImageData{
+					Image: container.Image,
+					Findings: []FindingData{
+						{
+							Namespace: pod.Namespace,
+							PodName:   pod.Name,
+						},
+					},
+				}
+			} else {
+				value.Findings = append(value.Findings, FindingData{
+					Namespace: pod.Namespace,
+					PodName:   pod.Name,
+				})
+				(*allImages)[container.Image] = value
+
+			}
+		}
+
+	}
 }
 
 // findKubeConfig finds path from env:KUBECONFIG or ~/.kube/config

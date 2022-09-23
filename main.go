@@ -111,7 +111,7 @@ func main() {
 
 // DTO containing the data collected by this tool
 type ImageData struct {
-	Running        []FindingData
+	Findings       []FindingData
 	Image          string
 	BuildTimestamp time.Time
 }
@@ -119,7 +119,7 @@ type ImageData struct {
 // information where the image has been found
 type FindingData struct {
 	Namespace string
-	Pod       string
+	PodName   string
 	Email     string // email address to notify, when image is outdated
 }
 
