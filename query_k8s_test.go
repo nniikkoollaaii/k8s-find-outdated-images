@@ -120,6 +120,46 @@ func TestFilterNamespace_FilterFlagOnlyKey(t *testing.T) {
 	}
 }
 
+func TestGetNamespaceData(t *testing.T) {
+	emailFlag := "email"
+	namespaces := make(map[string]corev1.Namespace)
+	namespaces["CorrectAnnotationNamespace"] = corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "CorrectAnnotationNamespace",
+			Annotations: map[string]string{
+				"email": "email@domain.de",
+			},
+		},
+	}
+	namespaces["WrongAnnotationNamespace"] = corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "WrongAnnotationNamespace",
+			Annotations: map[string]string{
+				"iwas": "email2@domain.de",
+			},
+		},
+	}
+	namespaces["NoAnnotationNamespace"] = corev1.Namespace{
+		ObjectMeta: v1.ObjectMeta{
+			Name: "NoAnnotationNamespace",
+		},
+	}
+
+	result := make(map[string]NotificationData)
+
+	getNamespaceData(emailFlag, namespaces, &result)
+
+	if result["CorrectAnnotationNamespace"].Email != "email@domain.de" {
+		t.Fatalf("Expected email set for namespace %s", "CorrectAnnotationNamespace")
+	}
+	if result["WrongAnnotationNamespace"].Email != "" {
+		t.Fatalf("Expected no email set for namespace %s", "WrongAnnotationNamespace")
+	}
+	if result["NoAnnotationNamespace"].Email != "" {
+		t.Fatalf("Expected no email set for namespace %s", "NoAnnotationNamespace")
+	}
+}
+
 func TestImageDataFromK8sAPI(t *testing.T) {
 	pods := corev1.PodList{
 		Items: []corev1.Pod{

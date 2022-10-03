@@ -44,30 +44,48 @@ func getK8sClient(ctx *cli.Context) *kubernetes.Clientset {
 	return clientset
 }
 
-func isFilteringEnabled(filterFlag string) bool {
-	if filterFlag == "" {
+func isFlagSet(flagValue string) bool {
+	if flagValue == "" {
 		return false
 	} else {
 		return true
 	}
 }
 
-func getImages(allImages *map[string]ImageData, ctx *cli.Context, clientset *kubernetes.Clientset) {
-
+func getNamespaces(result *map[string]NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
 	var allNamespaces = getAllNamespaces(clientset)
 
 	filterFlag := ctx.String(filterNamespaceAnnotationFlag.Name) // ToDo: Error Handling not correct value for flag
-
 	var namespaces = filterNamespaces(filterFlag, allNamespaces)
 
+	emailNamespaceAnnotationFlagValue := ctx.String(emailNamespaceAnnotationFlag.Name)
+	getNamespaceData(emailNamespaceAnnotationFlagValue, namespaces, result)
+
+}
+
+func getNamespaceData(emailNamespaceAnnotationFlagValue string, namespaces map[string]corev1.Namespace, result *map[string]NotificationData) {
+
+	for namespaceName, namespaceData := range namespaces {
+		notificationData := NotificationData{}
+
+		if isFlagSet(emailNamespaceAnnotationFlagValue) {
+			notificationData.Email = namespaceData.Annotations[emailNamespaceAnnotationFlagValue]
+		}
+
+		(*result)[namespaceName] = notificationData
+	}
+}
+
+func getImages(allImages *map[string]ImageData, namespaces *map[string]NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
+
 	// iterate over the filtered namespaces
-	for _, namespace := range namespaces {
+	for namespace := range *namespaces {
 		//query all pods in the namespace
-		pods, err := clientset.CoreV1().Pods(namespace.Name).List(context.TODO(), metav1.ListOptions{})
+		pods, err := clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			panic(err.Error())
 		}
-		log.Debugf("There are %d pods in the namespace %s", len(pods.Items), namespace.Name)
+		log.Debugf("There are %d pods in the namespace %s", len(pods.Items), namespace)
 
 		//iterate over all pods and their images and add to result set
 		addImageData(allImages, pods)
@@ -85,7 +103,7 @@ func getAllNamespaces(clientset *kubernetes.Clientset) *corev1.NamespaceList {
 func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) map[string]corev1.Namespace {
 	var result = make(map[string]corev1.Namespace)
 
-	if !isFilteringEnabled(filterFlag) {
+	if !isFlagSet(filterFlag) {
 		for _, namespace := range allNamespaces.Items {
 			result[namespace.Name] = namespace
 		}
@@ -147,10 +165,11 @@ func addImageData(allImages *map[string]ImageData, pods *corev1.PodList) {
 						{
 							Namespace: pod.Namespace,
 							PodName:   pod.Name,
+							//NotificationData: &,
 						},
 					},
 				}
-			} else { // when found add only the informationen where this image is used
+			} else { // when found add only the information where this image is used
 				value.Findings = append(value.Findings, FindingData{
 					Namespace: pod.Namespace,
 					PodName:   pod.Name,

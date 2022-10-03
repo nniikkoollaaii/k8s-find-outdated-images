@@ -120,7 +120,12 @@ type ImageData struct {
 type FindingData struct {
 	Namespace string
 	PodName   string
-	Email     string // email address to notify, when image is outdated
+	//NotificationData *NotificationData
+}
+
+type NotificationData struct {
+	Email string // email address to notify, when image is outdated
+	//ToDo: Support more notification methods
 }
 
 /**
@@ -129,6 +134,7 @@ type FindingData struct {
 func findOutdatedImages(ctx *cli.Context) error {
 
 	images := make(map[string]ImageData)
+	namespaces := make(map[string]NotificationData)
 
 	// Preprare:
 	var k8sclient = getK8sClient(ctx)
@@ -138,10 +144,13 @@ func findOutdatedImages(ctx *cli.Context) error {
 	}
 	oldestAllowedTimestamp := time.Now().Add(-allowedAge)
 
-	//1. Step: Get all (filtered) bcontainer images running in the cluster
-	getImages(&images, ctx, k8sclient)
+	//0. Step: Get all namespaces with relevant data and filter them
+	getNamespaces(&namespaces, ctx, k8sclient)
 
-	//2. Step: Query Registry for Build-Timestamp of the image
+	//1. Step: Get all (filtered) container images running in the cluster
+	getImages(&images, &namespaces, ctx, k8sclient)
+
+	//2. Step: Query Registry for Build-Timestamp of each image
 	queryTimestamps(&images)
 
 	log.Info(&images)
@@ -150,6 +159,6 @@ func findOutdatedImages(ctx *cli.Context) error {
 	filterOutdatedImages(&images, oldestAllowedTimestamp)
 
 	//4. Step: Output results
-	outputResult(&images, ctx)
+	outputResult(&images, &namespaces, ctx)
 	return nil
 }
