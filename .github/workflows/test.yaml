@@ -28,13 +28,19 @@ jobs:
         name: Install kubectl
         
       - name: Run test setup script
-        run: ./test/test_setup.sh
+        run: |
+          chmod +x ./test/test_setup.sh
+          ./test/test_setup.sh
         shell: bash
 
       - name: Run test script
-        run: ./test/test.sh
+        run: |
+          chmod +x ./test/test.sh
+          ./test/test.sh
         shell: bash
 
       - name: Check test result
-        run: ./test/test_check.sh
+        run: |
+          chmod +x ./test/test_check.sh
+          ./test/test_check.sh
         shell: bash
