@@ -1,2 +1,2 @@
-kubectl apply -f ns.yaml
-kubectl apply -f deployment.yaml
+kubectl apply -f test/ns.yaml
+kubectl apply -f test/deployment.yaml
