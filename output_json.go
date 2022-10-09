@@ -8,12 +8,11 @@ import (
 )
 
 func outputJsonResult(images *map[string]ImageData, ctx *cli.Context) {
-	resultFormat := ctx.String(resultFileFormat.Name)
-	if resultFormat != "json" {
+	if ctx.String(resultFileFormatFlag.Name) != "json" {
 		return
 	}
 
-	resultFileName := ctx.String(resultFileName.Name)
+	resultFileName := ctx.String(resultFileNameFlag.Name)
 
 	fileContent, err := getJson(images)
 	if err != nil {

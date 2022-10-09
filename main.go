@@ -58,7 +58,7 @@ var emailNamespaceAnnotationFlag = cli.StringFlag{
 	Value:       "",
 }
 
-var resultFileName = cli.StringFlag{
+var resultFileNameFlag = cli.StringFlag{
 	Name:        "output",
 	Aliases:     []string{"o"},
 	DefaultText: "result.json",
@@ -67,10 +67,10 @@ var resultFileName = cli.StringFlag{
 	Value:       "result.json",
 }
 
-var resultFileFormat = cli.StringFlag{
+var resultFileFormatFlag = cli.StringFlag{
 	Name:        "format",
 	DefaultText: "json",
-	Usage:       "The format of the results. Allowed values are \"json\" or \"csv\" (Default \"json\")",
+	Usage:       "The format of the results. Allowed values are \"json\" or \"csv\"",
 	Required:    false,
 	Value:       "json",
 }
@@ -102,7 +102,8 @@ func main() {
 					&ageFlag,
 					&filterNamespaceAnnotationFlag,
 					&emailNamespaceAnnotationFlag,
-					&resultFileName,
+					&resultFileNameFlag,
+					&resultFileFormatFlag,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)
@@ -160,8 +161,6 @@ func findOutdatedImages(ctx *cli.Context) error {
 
 	//2. Step: Query Registry for Build-Timestamp of each image
 	queryTimestamps(&images)
-
-	log.Info(&images)
 
 	//3. Step: filter Images which are outdated
 	filterOutdatedImages(&images, oldestAllowedTimestamp)

@@ -10,12 +10,11 @@ import (
 )
 
 func outputCsvResult(images *map[string]ImageData, ctx *cli.Context) {
-	resultFormat := ctx.String(resultFileFormat.Name)
-	if resultFormat != "csv" {
+	if ctx.String(resultFileFormatFlag.Name) != "csv" {
 		return
 	}
 
-	resultFileName := ctx.String(resultFileName.Name)
+	resultFileName := ctx.String(resultFileNameFlag.Name)
 
 	fileContent, err := getCsv(images)
 	if err != nil {
