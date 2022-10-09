@@ -145,7 +145,7 @@ func TestGetNamespaceData(t *testing.T) {
 		},
 	}
 
-	result := make(map[string]NotificationData)
+	result := make(map[string]*NotificationData)
 
 	getNamespaceData(emailFlag, namespaces, &result)
 
@@ -237,10 +237,17 @@ func TestImageDataFromK8sAPI(t *testing.T) {
 			},
 		},
 	}
+	notficationData := NotificationData{
+		Email: "test@domain.com",
+	}
+	namespaces := make(map[string]*NotificationData)
+	namespaces["ns1"] = &notficationData
+	namespaces["ns2"] = &notficationData
+	namespaces["ns3"] = &notficationData
 
 	allImages := make(map[string]ImageData)
 
-	addImageData(&allImages, &pods)
+	addImageData(&allImages, &namespaces, &pods)
 
 	if len(allImages) != 8 {
 		t.Fatalf("Wrong number of detected images: %d expected but got %d", 8, len(allImages))
@@ -268,5 +275,38 @@ func TestImageDataFromK8sAPI(t *testing.T) {
 	}
 	if len(allImages["my.domain.com/initcontainer4:v1"].Findings) != 1 {
 		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/initcontainer4:v1", 1, len(allImages["my.domain.com/initcontainer4:v1"].Findings))
+	}
+}
+
+func TestImageDataWithoutNamespaceNotifciationData(t *testing.T) {
+	pods := corev1.PodList{
+		Items: []corev1.Pod{
+			{
+				ObjectMeta: v1.ObjectMeta{
+					Namespace: "ns1",
+					Name:      "app1",
+				},
+				Spec: corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Image: "my.domain.com/container1:v1",
+						},
+					},
+				},
+			},
+		},
+	}
+	notficationData := NotificationData{
+		Email: "test@domain.com",
+	}
+	namespaces := make(map[string]*NotificationData)
+	namespaces["ns99"] = &notficationData
+
+	allImages := make(map[string]ImageData)
+
+	addImageData(&allImages, &namespaces, &pods)
+
+	if allImages["my.domain.com/container1:v1"].Findings[0].NotificationData != nil {
+		t.Fatalf("NotifcationData isn't nil")
 	}
 }

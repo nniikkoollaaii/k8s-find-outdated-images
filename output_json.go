@@ -7,18 +7,17 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func outputResult(images *map[string]ImageData, namespaces *map[string]NotificationData, ctx *cli.Context) {
-
-	test := struct {
-		Findings   map[string]ImageData
-		Namespaces map[string]NotificationData
-	}{
-		Findings:   *images,
-		Namespaces: *namespaces,
-	}
-	file, _ := json.MarshalIndent(test, "", " ")
-
+func outputJsonResult(images *map[string]ImageData, ctx *cli.Context) {
 	resultFileName := ctx.String(resultFileName.Name)
 
-	_ = ioutil.WriteFile(resultFileName, file, 0644)
+	fileContent, err := getJson(images)
+	if err != nil {
+		panic(err)
+	}
+
+	_ = ioutil.WriteFile(resultFileName, fileContent, 0644)
+}
+
+func getJson(images *map[string]ImageData) ([]byte, error) {
+	return json.MarshalIndent(images, "", " ")
 }

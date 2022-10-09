@@ -118,9 +118,9 @@ type ImageData struct {
 
 // information where the image has been found
 type FindingData struct {
-	Namespace string
-	PodName   string
-	//NotificationData *NotificationData
+	Namespace        string
+	PodName          string
+	NotificationData *NotificationData
 }
 
 type NotificationData struct {
@@ -134,7 +134,7 @@ type NotificationData struct {
 func findOutdatedImages(ctx *cli.Context) error {
 
 	images := make(map[string]ImageData)
-	namespaces := make(map[string]NotificationData)
+	namespaces := make(map[string]*NotificationData)
 
 	// Preprare:
 	var k8sclient = getK8sClient(ctx)
@@ -159,6 +159,6 @@ func findOutdatedImages(ctx *cli.Context) error {
 	filterOutdatedImages(&images, oldestAllowedTimestamp)
 
 	//4. Step: Output results
-	outputResult(&images, &namespaces, ctx)
+	outputJsonResult(&images, ctx)
 	return nil
 }

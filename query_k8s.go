@@ -52,7 +52,7 @@ func isFlagSet(flagValue string) bool {
 	}
 }
 
-func getNamespaces(result *map[string]NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
+func getNamespaces(result *map[string]*NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
 	var allNamespaces = getAllNamespaces(clientset)
 
 	filterFlag := ctx.String(filterNamespaceAnnotationFlag.Name) // ToDo: Error Handling not correct value for flag
@@ -63,7 +63,7 @@ func getNamespaces(result *map[string]NotificationData, ctx *cli.Context, client
 
 }
 
-func getNamespaceData(emailNamespaceAnnotationFlagValue string, namespaces map[string]corev1.Namespace, result *map[string]NotificationData) {
+func getNamespaceData(emailNamespaceAnnotationFlagValue string, namespaces map[string]corev1.Namespace, result *map[string]*NotificationData) {
 
 	for namespaceName, namespaceData := range namespaces {
 		notificationData := NotificationData{}
@@ -72,11 +72,11 @@ func getNamespaceData(emailNamespaceAnnotationFlagValue string, namespaces map[s
 			notificationData.Email = namespaceData.Annotations[emailNamespaceAnnotationFlagValue]
 		}
 
-		(*result)[namespaceName] = notificationData
+		(*result)[namespaceName] = &notificationData
 	}
 }
 
-func getImages(allImages *map[string]ImageData, namespaces *map[string]NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
+func getImages(allImages *map[string]ImageData, namespaces *map[string]*NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
 
 	// iterate over the filtered namespaces
 	for namespace := range *namespaces {
@@ -88,7 +88,7 @@ func getImages(allImages *map[string]ImageData, namespaces *map[string]Notificat
 		log.Debugf("There are %d pods in the namespace %s", len(pods.Items), namespace)
 
 		//iterate over all pods and their images and add to result set
-		addImageData(allImages, pods)
+		addImageData(allImages, namespaces, pods)
 	}
 }
 
@@ -149,7 +149,7 @@ func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) ma
 	return result
 }
 
-func addImageData(allImages *map[string]ImageData, pods *corev1.PodList) {
+func addImageData(allImages *map[string]ImageData, namespaces *map[string]*NotificationData, pods *corev1.PodList) {
 
 	//iterate over all pods and their images and add to result set
 	for _, pod := range pods.Items {
@@ -163,9 +163,9 @@ func addImageData(allImages *map[string]ImageData, pods *corev1.PodList) {
 					Image: initContainer.Image,
 					Findings: []FindingData{
 						{
-							Namespace: pod.Namespace,
-							PodName:   pod.Name,
-							//NotificationData: &,
+							Namespace:        pod.Namespace,
+							PodName:          pod.Name,
+							NotificationData: (*namespaces)[pod.Namespace],
 						},
 					},
 				}
