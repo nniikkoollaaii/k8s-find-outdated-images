@@ -35,7 +35,7 @@ var ageFlag = cli.StringFlag{
 	Name:        "age",
 	Aliases:     []string{"a"},
 	DefaultText: "30d",
-	Usage:       "The max allowed age of an image",
+	Usage:       "The max allowed age of an image. For example 1w2d6h3ns (1 week 2 days 6 hours and 3 nanoseconds).",
 	Required:    true,
 	Value:       "30d",
 }
