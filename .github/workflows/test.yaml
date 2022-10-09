@@ -4,6 +4,11 @@ on:
   pull_request:
     branches: [ main ]
 name: Test
+
+
+env:
+  KIND_CLUSTER_NAME: "cluster"
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,6 +28,9 @@ jobs:
         
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1.3.0
+        with:
+          cluster_name: ${KIND_CLUSTER_NAME}
+
 
       - uses: azure/setup-kubectl@v3
         name: Install kubectl
@@ -35,8 +43,7 @@ jobs:
 
       - name: Run test script
         run: |
-          chmod +x ./test/test.sh
-          ./test/test.sh
+          ./find-outdated-images find --context kind-${KIND_CLUSTER_NAME} --age 0h --filter type=workload --email email -o result.json
         shell: bash
 
       - name: Check test result
