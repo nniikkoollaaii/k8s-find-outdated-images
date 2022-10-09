@@ -1,12 +1,13 @@
 package main
 
 import (
-	"strings"
+	"bytes"
+	"encoding/csv"
 	"testing"
 	"time"
 )
 
-func TestJsonOutput(t *testing.T) {
+func TestCsvOutput(t *testing.T) {
 	notificationData := NotificationData{}
 	notificationData.Email = "test@domain.com"
 
@@ -23,14 +24,20 @@ func TestJsonOutput(t *testing.T) {
 		},
 	}
 
-	result, err := getJson(&images)
+	result, err := getCsv(&images)
 
 	if err != nil {
 		t.Fatalf("Error not nil when serializing to Json")
 	}
-	//check that email from pointer to NotificationData is serialized too
-	//ToDo: use better method of checking json value
-	if !strings.Contains(string(result), "\"Email\": \"test@domain.com\"") {
-		t.Fatalf("Output json does not contain expected key")
+	reader := bytes.NewReader(result)
+	csvReader := csv.NewReader(reader)
+
+	records, err := csvReader.ReadAll()
+
+	if err != nil {
+		t.Fatalf("Error not nil when serializing to Csv")
+	}
+	if records[1][3] != "test@domain.com" {
+		t.Fatalf("Output csv does not contain expected entry")
 	}
 }

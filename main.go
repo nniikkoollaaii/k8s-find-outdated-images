@@ -67,6 +67,14 @@ var resultFileName = cli.StringFlag{
 	Value:       "result.json",
 }
 
+var resultFileFormat = cli.StringFlag{
+	Name:        "format",
+	DefaultText: "json",
+	Usage:       "The format of the results. Allowed values are \"json\" or \"csv\" (Default \"json\")",
+	Required:    false,
+	Value:       "json",
+}
+
 func main() {
 
 	app := &cli.App{
@@ -160,5 +168,6 @@ func findOutdatedImages(ctx *cli.Context) error {
 
 	//4. Step: Output results
 	outputJsonResult(&images, ctx)
+	outputCsvResult(&images, ctx)
 	return nil
 }
