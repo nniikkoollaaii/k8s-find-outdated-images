@@ -71,7 +71,9 @@ func getNamespaceData(emailNamespaceAnnotationFlagValue string, namespaces map[s
 		notificationData := NotificationData{}
 
 		if isFlagSet(emailNamespaceAnnotationFlagValue) {
-			notificationData.Email = namespaceData.Annotations[emailNamespaceAnnotationFlagValue]
+			email := namespaceData.Annotations[emailNamespaceAnnotationFlagValue]
+			log.Debugf("Notification data email \"%s\" for namespace %s", email, namespaceName)
+			notificationData.Email = email
 		}
 
 		(*result)[namespaceName] = &notificationData
