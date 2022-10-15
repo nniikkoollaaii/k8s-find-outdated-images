@@ -164,6 +164,7 @@ func findOutdatedImages(ctx *cli.Context) error {
 
 	//3. Step: filter Images which are outdated
 	filterOutdatedImages(&images, oldestAllowedTimestamp)
+	log.Debugf("Found %d outdated images", len(images))
 
 	//4. Step: Output results
 	outputJsonResult(&images, ctx)

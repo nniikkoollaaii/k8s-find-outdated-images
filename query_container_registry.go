@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
+	log "github.com/sirupsen/logrus"
 )
 
 func queryTimestamps(allImages *map[string]ImageData) {
@@ -38,6 +39,8 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Debugf("Image %s 's build timestamp: %s", image, configFile.Created.Time)
 
 	return configFile.Created.Time
 

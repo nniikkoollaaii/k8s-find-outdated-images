@@ -43,7 +43,8 @@ jobs:
 
       - name: Run test script
         run: |
-          ./find-outdated-images find --context kind-${KIND_CLUSTER_NAME} --age 0h --filter type=workload --email email -o result.json
+          chmod +x ./test/test.sh
+          ./test/test.sh ${KIND_CLUSTER_NAME}
         shell: bash
 
       - name: Check test result

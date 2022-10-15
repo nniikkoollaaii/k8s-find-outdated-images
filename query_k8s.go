@@ -54,9 +54,11 @@ func isFlagSet(flagValue string) bool {
 
 func getNamespaces(result *map[string]*NotificationData, ctx *cli.Context, clientset *kubernetes.Clientset) {
 	var allNamespaces = getAllNamespaces(clientset)
+	log.Debugf("Found %d namespaces", len(allNamespaces.Items))
 
 	filterFlag := ctx.String(filterNamespaceAnnotationFlag.Name) // ToDo: Error Handling not correct value for flag
 	var namespaces = filterNamespaces(filterFlag, allNamespaces)
+	log.Debugf("After filtering %d namespaces to check", len(allNamespaces.Items))
 
 	emailNamespaceAnnotationFlagValue := ctx.String(emailNamespaceAnnotationFlag.Name)
 	getNamespaceData(emailNamespaceAnnotationFlagValue, namespaces, result)
@@ -157,6 +159,7 @@ func addImageData(allImages *map[string]ImageData, namespaces *map[string]*Notif
 		//first the initContainers array
 		initContainers := pod.Spec.InitContainers
 		for _, initContainer := range initContainers {
+			log.Debugf("Found image %s in pod %s in namespace %s", initContainer.Image, pod.Name, pod.Namespace)
 			value, exists := (*allImages)[initContainer.Image] //check if image is already in result set
 			if !exists {                                       // when not add ImageData struct with initial RunLocation
 				(*allImages)[initContainer.Image] = ImageData{
@@ -181,6 +184,7 @@ func addImageData(allImages *map[string]ImageData, namespaces *map[string]*Notif
 		// second the containers array
 		containers := pod.Spec.Containers
 		for _, container := range containers {
+			log.Debugf("Found image %s in pod %s in namespace %s", container.Image, pod.Name, pod.Namespace)
 			value, exists := (*allImages)[container.Image]
 			if !exists {
 				(*allImages)[container.Image] = ImageData{
