@@ -40,7 +40,7 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 		panic(err)
 	}
 
-	log.Debugf("Image %s 's build timestamp: %s", image, configFile.Created.Time)
+	log.Debugf("Build timestamp for image %s: %s", image, configFile.Created.Time)
 
 	return configFile.Created.Time
 

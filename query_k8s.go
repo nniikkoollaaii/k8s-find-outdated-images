@@ -58,7 +58,7 @@ func getNamespaces(result *map[string]*NotificationData, ctx *cli.Context, clien
 
 	filterFlag := ctx.String(filterNamespaceAnnotationFlag.Name) // ToDo: Error Handling not correct value for flag
 	var namespaces = filterNamespaces(filterFlag, allNamespaces)
-	log.Debugf("After filtering %d namespaces to check", len(allNamespaces.Items))
+	log.Debugf("After filtering %d namespaces to check", len(namespaces))
 
 	emailNamespaceAnnotationFlagValue := ctx.String(emailNamespaceAnnotationFlag.Name)
 	getNamespaceData(emailNamespaceAnnotationFlagValue, namespaces, result)
