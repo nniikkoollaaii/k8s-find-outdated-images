@@ -1,1 +1,1 @@
-./find-outdated-images -v find --context kind-$1 --age 0h --filter type=workload --email email -o result.json
+./k8s-find-outdated-images -v find --context kind-$1 --age 0h --filter type=workload --email email -o result.json

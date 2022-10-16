@@ -1,3 +1,3 @@
 FROM scratch
-ENTRYPOINT ["/find-outdated-images"]
-COPY find-outdated-images /
+ENTRYPOINT ["/k8s-find-outdated-images"]
+COPY k8s-find-outdated-images /

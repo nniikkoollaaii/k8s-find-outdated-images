@@ -1,4 +1,4 @@
-module github.com/nniikkoollaaii/find-outdated-images
+module github.com/nniikkoollaaii/k8s-find-outdated-images
 
 go 1.18
 

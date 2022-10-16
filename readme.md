@@ -4,7 +4,7 @@ Query your Kubernetes cluster for images and check if they're outdated. Remember
 
 ## Usage
 
-    ./find-outdated-images -v find --context kind-kind --age 0h --filter type=workload --email email -o result.json
+    ./k8s-find-outdated-images -v find --context kind-kind --age 0h --filter type=workload --email email -o result.json
 
 ## Development
 
