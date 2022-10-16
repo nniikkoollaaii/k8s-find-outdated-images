@@ -9,9 +9,7 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - main: ./k8s-find-outdated-images
-    binary: k8s-find-outdated-images
-    env:
+  - env:
       - CGO_ENABLED=0
     goos:
       - linux
