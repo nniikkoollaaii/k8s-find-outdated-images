@@ -75,6 +75,12 @@ var resultFileFormatFlag = cli.StringFlag{
 	Value:       "json",
 }
 
+var resultGroupByFlag = cli.StringFlag{
+	Name:     "group-by",
+	Usage:    "The result is per default ordered by image and notification data is displayed per image. Use this flag to use one of the notification data values to group the result. Allowed values are \"email\"",
+	Required: false,
+}
+
 func main() {
 
 	app := &cli.App{
@@ -104,6 +110,7 @@ func main() {
 					&emailNamespaceAnnotationFlag,
 					&resultFileNameFlag,
 					&resultFileFormatFlag,
+					&resultGroupByFlag,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)
