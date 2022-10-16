@@ -2,4 +2,6 @@
 
     kind create cluster
 
-    ./test_setup.sh
+    ./test/test_setup.sh
+
+    ./test/test.sh

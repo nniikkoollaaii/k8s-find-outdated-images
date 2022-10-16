@@ -92,7 +92,7 @@ func getImages(allImages *map[string]ImageData, namespaces *map[string]*Notifica
 		log.Debugf("There are %d pods in the namespace %s", len(pods.Items), namespace)
 
 		//iterate over all pods and their images and add to result set
-		addImageData(allImages, namespaces, pods)
+		parsePods(allImages, namespaces, pods)
 	}
 }
 
@@ -153,7 +153,7 @@ func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) ma
 	return result
 }
 
-func addImageData(allImages *map[string]ImageData, namespaces *map[string]*NotificationData, pods *corev1.PodList) {
+func parsePods(allImages *map[string]ImageData, namespaces *map[string]*NotificationData, pods *corev1.PodList) {
 
 	//iterate over all pods and their images and add to result set
 	for _, pod := range pods.Items {
@@ -162,52 +162,38 @@ func addImageData(allImages *map[string]ImageData, namespaces *map[string]*Notif
 		initContainers := pod.Spec.InitContainers
 		for _, initContainer := range initContainers {
 			log.Debugf("Found image %s in pod %s in namespace %s", initContainer.Image, pod.Name, pod.Namespace)
-			value, exists := (*allImages)[initContainer.Image] //check if image is already in result set
-			if !exists {                                       // when not add ImageData struct with initial RunLocation
-				(*allImages)[initContainer.Image] = ImageData{
-					Image: initContainer.Image,
-					Findings: []FindingData{
-						{
-							Namespace:        pod.Namespace,
-							PodName:          pod.Name,
-							NotificationData: (*namespaces)[pod.Namespace],
-						},
-					},
-				}
-			} else { // when found add only the information where this image is used
-				value.Findings = append(value.Findings, FindingData{
-					Namespace: pod.Namespace,
-					PodName:   pod.Name,
-				})
-				(*allImages)[initContainer.Image] = value
-			}
+			addImageData(initContainer.Image, pod.Name, pod.Namespace, allImages, namespaces)
 		}
 
 		// second the containers array
 		containers := pod.Spec.Containers
 		for _, container := range containers {
 			log.Debugf("Found image %s in pod %s in namespace %s", container.Image, pod.Name, pod.Namespace)
-			value, exists := (*allImages)[container.Image]
-			if !exists {
-				(*allImages)[container.Image] = ImageData{
-					Image: container.Image,
-					Findings: []FindingData{
-						{
-							Namespace: pod.Namespace,
-							PodName:   pod.Name,
-						},
-					},
-				}
-			} else {
-				value.Findings = append(value.Findings, FindingData{
-					Namespace: pod.Namespace,
-					PodName:   pod.Name,
-				})
-				(*allImages)[container.Image] = value
-
-			}
+			addImageData(container.Image, pod.Name, pod.Namespace, allImages, namespaces)
 		}
+	}
+}
 
+func addImageData(image string, podName string, namespace string, allImages *map[string]ImageData, namespaces *map[string]*NotificationData) {
+	value, exists := (*allImages)[image]
+	if !exists {
+		(*allImages)[image] = ImageData{
+			Image: image,
+			Findings: []FindingData{
+				{
+					Namespace:        namespace,
+					PodName:          podName,
+					NotificationData: (*namespaces)[namespace],
+				},
+			},
+		}
+	} else {
+		value.Findings = append(value.Findings, FindingData{
+			Namespace:        namespace,
+			PodName:          podName,
+			NotificationData: (*namespaces)[namespace],
+		})
+		(*allImages)[image] = value
 	}
 }
 

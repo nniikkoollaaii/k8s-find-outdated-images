@@ -247,13 +247,17 @@ func TestImageDataFromK8sAPI(t *testing.T) {
 
 	allImages := make(map[string]ImageData)
 
-	addImageData(&allImages, &namespaces, &pods)
+	parsePods(&allImages, &namespaces, &pods)
 
 	if len(allImages) != 8 {
 		t.Fatalf("Wrong number of detected images: %d expected but got %d", 8, len(allImages))
 	}
 	if len(allImages["my.domain.com/container1:v1"].Findings) != 1 {
 		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/container1:v1", 1, len(allImages["my.domain.com/container1:v1"].Findings))
+	}
+	data1 := *(allImages["my.domain.com/container1:v1"].Findings[0].NotificationData)
+	if data1.Email != "test@domain.com" {
+		t.Fatalf("NotifcationData email isn't expected value")
 	}
 	if len(allImages["my.domain.com/container2:v1"].Findings) != 2 {
 		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/container2:v1", 2, len(allImages["my.domain.com/container2:v1"].Findings))
@@ -304,7 +308,7 @@ func TestImageDataWithoutNamespaceNotifciationData(t *testing.T) {
 
 	allImages := make(map[string]ImageData)
 
-	addImageData(&allImages, &namespaces, &pods)
+	parsePods(&allImages, &namespaces, &pods)
 
 	if allImages["my.domain.com/container1:v1"].Findings[0].NotificationData != nil {
 		t.Fatalf("NotifcationData isn't nil")
