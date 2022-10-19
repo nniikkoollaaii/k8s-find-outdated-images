@@ -12,9 +12,9 @@ builds:
       - darwin
 dockers:
   - image_templates:
-      - nniikkoollaaii/k8s-find-outdated-images:latest
-      - nniikkoollaaii/k8s-find-outdated-images:v{{ .Major }}
-      - nniikkoollaaii/k8s-find-outdated-images:{{ .Tag }}
+      - ghcr.io/nniikkoollaaii/k8s-find-outdated-images:latest
+      - ghcr.io/nniikkoollaaii/k8s-find-outdated-images:v{{ .Major }}
+      - ghcr.io/nniikkoollaaii/k8s-find-outdated-images:{{ .Tag }}
     goos: linux
     goarch: amd64
     build_flag_templates:
@@ -23,9 +23,9 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
   - image_templates:
-      - nniikkoollaaii/k8s-find-outdated-images:latest
-      - nniikkoollaaii/k8s-find-outdated-images:v{{ .Major }}
-      - nniikkoollaaii/k8s-find-outdated-images:{{ .Tag }}
+      - ghcr.io/nniikkoollaaii/k8s-find-outdated-images:latest
+      - ghcr.io/nniikkoollaaii/k8s-find-outdated-images:v{{ .Major }}
+      - ghcr.io/nniikkoollaaii/k8s-find-outdated-images:{{ .Tag }}
     goos: linux
     goarch: arm64
     build_flag_templates:
