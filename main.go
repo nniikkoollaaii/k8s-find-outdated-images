@@ -118,24 +118,6 @@ func main() {
 	}
 }
 
-// DTO containing the data collected by this tool
-type ImageData struct {
-	Findings       []FindingData
-	Image          string
-	BuildTimestamp time.Time
-}
-
-// information where the image has been found
-type FindingData struct {
-	Namespace        string
-	PodName          string
-	NotificationData *NotificationData
-}
-
-type NotificationData struct {
-	Email string // email address to notify, when image is outdated
-	//ToDo: Support more notification methods
-}
 
 /**
 * Template method
