@@ -1,5 +1,9 @@
 package main
 
+import (
+	"time"
+)
+
 // DTO containing the data collected by this tool
 type ImageData struct {
 	Findings       []FindingData
@@ -20,13 +24,21 @@ type NotificationData struct {
 	//ToDo: Support more notification methods
 }
 
-
 // customized result output format
 type ResultGroupedByEmail struct {
-	Findings [NotificationContentData]
+	//key: email address
+	Notifications map[string]ResultGroupedByEmailOutdatedImages
 }
-type NotificationContentData struct {
-	Image string
+type ResultGroupedByEmailOutdatedImages struct {
+	//key: image name
+	Images map[string]ResultContentData
+}
+type ResultContentData struct {
+	BuildTimestamp time.Time
+	Findings       []ResultContentFindingData
+}
+
+type ResultContentFindingData struct {
 	Namespace string
-	BuildTimestamp string
+	PodName   string
 }

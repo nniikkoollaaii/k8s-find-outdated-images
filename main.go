@@ -75,6 +75,11 @@ var resultFileFormatFlag = cli.StringFlag{
 	Value:       "json",
 }
 
+var resultFormatGroupByEmailFlag = cli.BoolFlag{
+	Name:  "groupByEmail",
+	Usage: "groups the findings by email in the json output format (only applicable to the json output)",
+}
+
 func main() {
 
 	app := &cli.App{
@@ -104,6 +109,7 @@ func main() {
 					&emailNamespaceAnnotationFlag,
 					&resultFileNameFlag,
 					&resultFileFormatFlag,
+					&resultFormatGroupByEmailFlag,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)
@@ -117,7 +123,6 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
 
 /**
 * Template method
