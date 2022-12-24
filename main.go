@@ -75,6 +75,11 @@ var resultFileFormatFlag = cli.StringFlag{
 	Value:       "json",
 }
 
+var resultFormatGroupByEmailFlag = cli.BoolFlag{
+	Name:  "groupByEmail",
+	Usage: "groups the findings by email in the json output format (only applicable to the json output)",
+}
+
 func main() {
 
 	app := &cli.App{
@@ -104,6 +109,7 @@ func main() {
 					&emailNamespaceAnnotationFlag,
 					&resultFileNameFlag,
 					&resultFileFormatFlag,
+					&resultFormatGroupByEmailFlag,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)
@@ -116,25 +122,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// DTO containing the data collected by this tool
-type ImageData struct {
-	Findings       []FindingData
-	Image          string
-	BuildTimestamp time.Time
-}
-
-// information where the image has been found
-type FindingData struct {
-	Namespace        string
-	PodName          string
-	NotificationData *NotificationData
-}
-
-type NotificationData struct {
-	Email string // email address to notify, when image is outdated
-	//ToDo: Support more notification methods
 }
 
 /**
