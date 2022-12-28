@@ -84,6 +84,10 @@ var sendEmailFlag = cli.BoolFlag{
 	Name:  "sendEmail",
 	Usage: "when set, send email notification with findings to email recipients found on the namespace metadata configured by the --email flag",
 }
+var sendAdminEmailFlag = cli.BoolFlag{
+	Name:  "sendAdminEmail",
+	Usage: "when set, send Admin email notification with findings to email recipients found on the namespace metadata configured by the --email flag",
+}
 var smtpSenderAddressFlag = cli.StringFlag{
 	Name:     "smtpSenderAddress",
 	Usage:    "The sender email address to use",
@@ -104,6 +108,11 @@ var smtpPasswordFlag = cli.StringFlag{
 var smtpServerAddressFlag = cli.StringFlag{
 	Name:     "smtpAddress",
 	Usage:    "Adress of the SMTP server (expected format is host:port)",
+	Required: false,
+}
+var emailAdminAdress = cli.StringFlag{
+	Name:     "emailAdminAddress",
+	Usage:    "Email-Adress to send to the Admin report",
 	Required: false,
 }
 
@@ -138,6 +147,7 @@ func main() {
 					&resultFileFormatFlag,
 					&resultFormatGroupByEmailFlag,
 					&sendEmailFlag,
+					&sendAdminEmailFlag,
 					&smtpSenderAddressFlag,
 					&smtpUsernameFlag,
 					&smtpPasswordFlag,
