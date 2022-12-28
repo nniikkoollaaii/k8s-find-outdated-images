@@ -32,8 +32,7 @@ func outputJsonResult(images *map[string]ImageData, ctx *cli.Context) {
 func getJson(images *map[string]ImageData) ([]byte, error) {
 	return json.MarshalIndent(images, "", " ")
 }
-
-func getJsonGroupedByEmail(images *map[string]ImageData) ([]byte, error) {
+func groupFindingsByEmail(images *map[string]ImageData) ResultGroupedByEmail {
 	var result ResultGroupedByEmail
 	result.Notifications = make(map[string]ResultGroupedByEmailOutdatedImages)
 
@@ -84,8 +83,12 @@ func getJsonGroupedByEmail(images *map[string]ImageData) ([]byte, error) {
 				}
 			}
 		}
-
 	}
 
+	return result
+}
+
+func getJsonGroupedByEmail(images *map[string]ImageData) ([]byte, error) {
+	result := groupFindingsByEmail(images)
 	return json.MarshalIndent(result, "", " ")
 }
