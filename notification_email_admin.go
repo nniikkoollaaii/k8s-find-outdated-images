@@ -1,10 +1,13 @@
 package main
 
 import (
-	"log"
+	"bytes"
+	"fmt"
 	"net/mail"
 	"net/smtp"
+	"text/template"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -36,12 +39,12 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	}
 
 	// build email content
-	body, _ := getJson(images)
+	emailBodyContent := templateAdminEmailBodyContent(*images)
 	request := Mail{
 		Sender:  from,
 		To:      []string{to},
-		Subject: "Outdated container images in use [Admin Report]",
-		Body:    body,
+		Subject: fmt.Sprintf("Outdated container images older than %s in use [Admin Report]", ctx.String(ageFlag.Name)),
+		Body:    emailBodyContent.Bytes(),
 	}
 
 	msg := buildMessage(request)
@@ -54,10 +57,67 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 		getHostForSMTPAdress(ctx.String(smtpServerAddressFlag.Name)),
 	)
 
-	err = smtp.SendMail(ctx.String(smtpSenderAddressFlag.Name), auth, request.Sender, request.To, []byte(msg))
+	err = smtp.SendMail(ctx.String(smtpServerAddressFlag.Name), auth, request.Sender, request.To, []byte(msg))
 
 	if err != nil {
-		log.Fatal(err)
-		cli.Exit("Error sending admin report via email", 1)
+		log.Error("Error sending admin report via email", err)
+		//cli.Exit("Error sending admin report via email", 1)
+	} else {
+		log.Debugf("Successful sent Admin email to %s via %s", request.To[0], ctx.String(smtpServerAddressFlag.Name))
 	}
 }
+
+func templateAdminEmailBodyContent(outdatedImages map[string]ImageData) bytes.Buffer {
+	tmpl := template.Must(template.New("emailAdminNotificationTemplate").Parse(emailAdminNotificationTemplate))
+	var emailBodyContent bytes.Buffer
+	if err := tmpl.Execute(&emailBodyContent, outdatedImages); err != nil {
+		log.Error(err.Error())
+		cli.Exit("Error during building notification admin email content", 1)
+	}
+	return emailBodyContent
+}
+
+var emailAdminNotificationTemplate = `
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+</style>
+</head>
+<body>
+<p>
+The following container images are outdated.
+</p>
+<p>
+</p>
+<table>
+  <tr>
+    <th>Image</th>
+    <th>BuildTimestamp</th>
+    <th>Namespace</th>
+    <th>PodName</th>
+  </tr>
+  {{ range $image, $imageData := .}}
+  {{ range $imageData.Findings }}
+  <tr>
+    <td>{{ $image }}</td>
+    <td>{{ $imageData.BuildTimestamp.Format "02 Jan 06 15:04 UTC" }}</td>
+    <td>{{ .Namespace }}</td>
+    <td>{{ .PodName }}</td>
+  </tr>
+  {{ end }}
+  {{ end }}
+</table>
+</body>
+</html>
+`

@@ -152,6 +152,7 @@ func main() {
 					&smtpUsernameFlag,
 					&smtpPasswordFlag,
 					&smtpServerAddressFlag,
+					&emailAdminAdress,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)
@@ -200,6 +201,7 @@ func findOutdatedImages(ctx *cli.Context) error {
 	outputCsvResult(&images, ctx)
 
 	//5. Step: Send notifications
+	sendEmailAdminNotification(&images, ctx)
 	sendEmailNotifications(&images, ctx)
 	return nil
 }

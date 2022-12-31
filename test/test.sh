@@ -1,1 +1,2 @@
-./k8s-find-outdated-images -v find --context kind-$1 --age 0h --filter type=workload --email email -o result.json
+#./k8s-find-outdated-images -v find --context kind-$1 --age 0h --filter type=workload --email email -o result.json
+./k8s-find-outdated-images -v find --context kind-$1 --age 0h --filter type=workload --email email -o result.json --sendAdminEmail --smtpSenderAddress test@test.com --smtpUsername test --smtpPassword test --smtpAddress localhost:1025 --emailAdminAddress "nniikkoollaaii@test.com" --sendEmail

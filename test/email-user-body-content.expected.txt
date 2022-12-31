@@ -1,0 +1,63 @@
+
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+</style>
+</head>
+<body>
+<p>
+The following container images are outdated.
+</p>
+<p>
+</p>
+<table>
+  <tr>
+    <th>Image</th>
+    <th>BuildTimestamp</th>
+    <th>Namespace</th>
+    <th>PodName</th>
+  </tr>
+  
+  
+  <tr>
+    <td>nginx:1.14.2</td>
+    <td>26 Mar 19 23:14 UTC</td>
+    <td>test</td>
+    <td>nginx-deployment-6595874d85-k8sxc</td>
+  </tr>
+  
+  <tr>
+    <td>nginx:1.14.2</td>
+    <td>26 Mar 19 23:14 UTC</td>
+    <td>test</td>
+    <td>nginx-deployment-6595874d85-mxxrd</td>
+  </tr>
+  
+  <tr>
+    <td>nginx:1.14.2</td>
+    <td>26 Mar 19 23:14 UTC</td>
+    <td>test</td>
+    <td>nginx-deployment-6595874d85-wptl9</td>
+  </tr>
+  
+  
+</table>
+<p>
+</p>
+<p>
+Please update or rebuild your application immediatly.
+</p>
+</body>
+</html>
+

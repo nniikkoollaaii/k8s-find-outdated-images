@@ -4,4 +4,6 @@
 
     ./test/test_setup.sh
 
-    ./test/test.sh
+    ./test/test.sh kind
+
+    ./test/test_check.sh
