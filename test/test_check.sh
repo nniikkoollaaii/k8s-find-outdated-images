@@ -48,7 +48,7 @@ if [[ "$(curl -s localhost:8025/api/v1/messages | jq -r ".[$adminEmailIndex].Con
 fi
 
 
-curl -s localhost:8025/api/v1/messages | jq -r ".[$adminEmailIndex].Content.Body" > test/email-admin-body-content.actual.txt
+curl -s localhost:8025/api/v1/messages | jq -r ".[$adminEmailIndex].Content.Body" | tr -d '\r\n' > test/email-admin-body-content.actual.txt
 if [[ "$(cat -n test/email-admin-body-content.actual.txt)" != "$(cat -n test/email-admin-body-content.expected.txt)" ]]; then
   echo "Check Admin email body content failed"; exit 1;
 fi
@@ -74,7 +74,7 @@ if [[ "$(curl -s localhost:8025/api/v1/messages | jq -r ".[$userEmailIndex].Cont
 fi
 
 
-curl -s localhost:8025/api/v1/messages | jq -r ".[$userEmailIndex].Content.Body" > test/email-user-body-content.actual.txt
+curl -s localhost:8025/api/v1/messages | jq -r ".[$userEmailIndex].Content.Body" | tr -d '\r\n' > test/email-user-body-content.actual.txt
 if [[ "$(cat -n test/email-user-body-content.actual.txt)" != "$(cat -n test/email-user-body-content.expected.txt)" ]]; then
   echo "Check User email body content failed"; exit 1;
 fi
