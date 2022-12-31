@@ -49,6 +49,9 @@ fi
 
 
 curl -s localhost:8025/api/v1/messages | jq -r ".[$adminEmailIndex].Content.Body" | tr -d '\r\n' > test/email-admin-body-content.actual.txt
+cat -n test/email-admin-body-content.actual.txt
+cat -n test/email-admin-body-content.expected.txt
+
 if [[ "$(cat -n test/email-admin-body-content.actual.txt)" != "$(cat -n test/email-admin-body-content.expected.txt)" ]]; then
   echo "Check Admin email body content failed"; exit 1;
 fi
