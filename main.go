@@ -17,7 +17,7 @@ var verboseFlag = cli.BoolFlag{
 	Usage:   "enables debugging log level",
 }
 var versionFlag = cli.BoolFlag{
-	Name:    "print-version",
+	Name:    "version",
 	Aliases: []string{"V"},
 	Usage:   "print only the version",
 }
@@ -80,6 +80,42 @@ var resultFormatGroupByEmailFlag = cli.BoolFlag{
 	Usage: "groups the findings by email in the json output format (only applicable to the json output)",
 }
 
+var sendEmailFlag = cli.BoolFlag{
+	Name:  "sendEmail",
+	Usage: "when set, send email notification with findings to email recipients found on the namespace metadata configured by the --email flag",
+}
+var sendAdminEmailFlag = cli.BoolFlag{
+	Name:  "sendAdminEmail",
+	Usage: "when set, send Admin email notification with findings to email recipients found on the namespace metadata configured by the --email flag",
+}
+var smtpSenderAddressFlag = cli.StringFlag{
+	Name:     "smtpSenderAddress",
+	Usage:    "The sender email address to use",
+	Required: false,
+}
+var smtpUsernameFlag = cli.StringFlag{
+	Name:     "smtpUsername",
+	Usage:    "Username for authenticating with the SMTP server",
+	Required: false,
+}
+
+var smtpPasswordFlag = cli.StringFlag{
+	Name:     "smtpPassword",
+	Usage:    "Password for authenticating with the SMTP server",
+	Required: false,
+}
+
+var smtpServerAddressFlag = cli.StringFlag{
+	Name:     "smtpAddress",
+	Usage:    "Adress of the SMTP server (expected format is host:port)",
+	Required: false,
+}
+var emailAdminAdress = cli.StringFlag{
+	Name:     "emailAdminAddress",
+	Usage:    "Email-Adress to send to the Admin report",
+	Required: false,
+}
+
 func main() {
 
 	app := &cli.App{
@@ -96,7 +132,7 @@ func main() {
 			return nil
 		},
 		Commands: []*cli.Command{
-			&cli.Command{
+			{
 				Name:      "find",
 				Usage:     "do it!",
 				UsageText: "find - does the finding",
@@ -110,6 +146,13 @@ func main() {
 					&resultFileNameFlag,
 					&resultFileFormatFlag,
 					&resultFormatGroupByEmailFlag,
+					&sendEmailFlag,
+					&sendAdminEmailFlag,
+					&smtpSenderAddressFlag,
+					&smtpUsernameFlag,
+					&smtpPasswordFlag,
+					&smtpServerAddressFlag,
+					&emailAdminAdress,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)
@@ -156,5 +199,9 @@ func findOutdatedImages(ctx *cli.Context) error {
 	//4. Step: Output results
 	outputJsonResult(&images, ctx)
 	outputCsvResult(&images, ctx)
+
+	//5. Step: Send notifications
+	sendEmailAdminNotification(&images, ctx)
+	sendEmailNotifications(&images, ctx)
 	return nil
 }
