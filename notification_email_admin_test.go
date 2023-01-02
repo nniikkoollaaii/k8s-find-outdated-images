@@ -41,7 +41,7 @@ func TestEmailAdminTemplating(t *testing.T) {
 		},
 	}
 
-	result := templateAdminEmailBodyContent(images)
+	result := templateAdminEmailBodyContent(images, "", "")
 
 	expectedResult := `
 <html>
@@ -100,6 +100,79 @@ The following container images are outdated.
   
   
 </table>
+</body>
+</html>
+`
+
+	if result.String() != expectedResult {
+		t.Fatalf("Notification Email Admin Template Result is wrong.")
+	}
+}
+
+func TestEmailAdminTemplatingCustomPrefixAndSuffixInContent(t *testing.T) {
+	notificationData := NotificationData{}
+	notificationData.Email = "test@domain.com"
+
+	layout := "2006-01-02T15:04:05.000Z"
+	fakeBuildTimestamp, _ := time.Parse(layout, "2022-12-31T13:10:00.000Z")
+
+	images := make(map[string]ImageData)
+	images["my.domain.com/image:v1"] = ImageData{
+		Image:          "my.domain.com/image:v1",
+		BuildTimestamp: fakeBuildTimestamp,
+		Findings: []FindingData{
+			{
+				Namespace:        "test",
+				PodName:          "testpod",
+				NotificationData: &notificationData,
+			},
+		},
+	}
+
+	result := templateAdminEmailBodyContent(images, "./test/email_content_prefix.tpl", "./test/email_content_suffix.tpl")
+
+	expectedResult := `
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+</style>
+</head>
+<body>
+<p>
+Test Prefix
+</p>
+<table>
+  <tr>
+    <th>Image</th>
+    <th>BuildTimestamp</th>
+    <th>Namespace</th>
+    <th>PodName</th>
+  </tr>
+  
+  
+  <tr>
+    <td>my.domain.com/image:v1</td>
+    <td>31 Dec 22 13:10 UTC</td>
+    <td>test</td>
+    <td>testpod</td>
+  </tr>
+  
+  
+</table>
+<p>
+Test Suffix
+</p>
 </body>
 </html>
 `

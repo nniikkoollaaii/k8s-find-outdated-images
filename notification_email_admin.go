@@ -39,7 +39,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	}
 
 	// build email content
-	emailBodyContent := templateAdminEmailBodyContent(*images)
+	emailBodyContent := templateAdminEmailBodyContent(*images, ctx.String(emailAdminContentPrefixFilePathFlag.Name), ctx.String(emailAdminContentSuffixFilePathFlag.Name))
 	request := Mail{
 		Sender:  from,
 		To:      []string{to},
@@ -67,40 +67,35 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	}
 }
 
-func templateAdminEmailBodyContent(outdatedImages map[string]ImageData) bytes.Buffer {
+func templateAdminEmailBodyContent(outdatedImages map[string]ImageData, prefixContentFlagValue string, suffixContentFlagValue string) bytes.Buffer {
 	tmpl := template.Must(template.New("emailAdminNotificationTemplate").Parse(emailAdminNotificationTemplate))
 	var emailBodyContent bytes.Buffer
+
+	emailBodyContent.WriteString("\n")
+	emailBodyContent.WriteString("<html>\n")
+	emailBodyContent.WriteString(emailHTMLHeader)
+
+	emailBodyContent.WriteString("<body>\n")
+
+	//write prefix content
+	addEmailContentOrDefault(prefixContentFlagValue, emailAdminDefaultPrefixContent, &emailBodyContent)
+
+	//write result in html table
 	if err := tmpl.Execute(&emailBodyContent, outdatedImages); err != nil {
 		log.Error(err.Error())
 		cli.Exit("Error during building notification admin email content", 1)
 	}
+
+	//write suffix content
+	addEmailContentOrDefault(suffixContentFlagValue, emailAdminDefaultSuffixContent, &emailBodyContent)
+
+	emailBodyContent.WriteString("</body>\n")
+
+	emailBodyContent.WriteString("</html>\n")
 	return emailBodyContent
 }
 
-var emailAdminNotificationTemplate = `
-<html>
-<head>
-<style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-</style>
-</head>
-<body>
-<p>
-The following container images are outdated.
-</p>
-<p>
-</p>
-<table>
+var emailAdminNotificationTemplate = `<table>
   <tr>
     <th>Image</th>
     <th>BuildTimestamp</th>
@@ -118,6 +113,13 @@ The following container images are outdated.
   {{ end }}
   {{ end }}
 </table>
-</body>
-</html>
 `
+
+var emailAdminDefaultPrefixContent = `<p>
+The following container images are outdated.
+</p>
+<p>
+</p>
+`
+
+var emailAdminDefaultSuffixContent = ``

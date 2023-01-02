@@ -14,7 +14,7 @@ import (
 
 func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 	//check that --sendEmail flag is send and user want to send emails. If not return early.
-	if !ctx.Bool(sendEmailFlag.Name) {
+	if !ctx.Bool(sendEmailUserFlag.Name) {
 		return
 	}
 
@@ -47,7 +47,7 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 		}
 
 		// build email content
-		emailBodyContent := templateUserEmailBodyContent(outdatedImages)
+		emailBodyContent := templateUserEmailBodyContent(outdatedImages, ctx.String(emailUserContentPrefixFilePathFlag.Name), ctx.String(emailUserContentSuffixFilePathFlag.Name))
 		request := Mail{
 			Sender:  from,
 			To:      []string{recipient},
@@ -68,48 +68,43 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 		err = smtp.SendMail(ctx.String(smtpServerAddressFlag.Name), auth, request.Sender, request.To, []byte(msg))
 
 		if err != nil {
-			log.Error("Error sending admin report via email", err)
-			//cli.Exit("Error sending admin report via email", 1)
+			log.Error("Error sending User report via email", err)
+			//cli.Exit("Error sending User report via email", 1)
 		} else {
 			log.Debugf("Successful sent User email to %s via %s", request.To[0], ctx.String(smtpServerAddressFlag.Name))
 		}
 	}
 }
 
-func templateUserEmailBodyContent(outdatedImages ResultGroupedByEmailOutdatedImages) bytes.Buffer {
+func templateUserEmailBodyContent(outdatedImages ResultGroupedByEmailOutdatedImages, prefixContentFlagValue string, suffixContentFlagValue string) bytes.Buffer {
 	tmpl := template.Must(template.New("emailUserNotificationTemplate").Parse(emailUserNotificationTemplate))
 	var emailBodyContent bytes.Buffer
+
+	emailBodyContent.WriteString("\n")
+	emailBodyContent.WriteString("<html>\n")
+	emailBodyContent.WriteString(emailHTMLHeader)
+
+	emailBodyContent.WriteString("<body>\n")
+
+	//write prefix content
+	addEmailContentOrDefault(prefixContentFlagValue, emailUserDefaultPrefixContent, &emailBodyContent)
+
+	//write result in html table
 	if err := tmpl.Execute(&emailBodyContent, outdatedImages); err != nil {
 		log.Error(err.Error())
 		cli.Exit("Error during building notification user email content", 1)
 	}
+
+	//write suffix content
+	addEmailContentOrDefault(suffixContentFlagValue, emailUserDefaultSuffixContent, &emailBodyContent)
+
+	emailBodyContent.WriteString("</body>\n")
+
+	emailBodyContent.WriteString("</html>\n")
 	return emailBodyContent
 }
 
-var emailUserNotificationTemplate = `
-<html>
-<head>
-<style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-</style>
-</head>
-<body>
-<p>
-The following container images are outdated.
-</p>
-<p>
-</p>
-<table>
+var emailUserNotificationTemplate = `<table>
   <tr>
     <th>Image</th>
     <th>BuildTimestamp</th>
@@ -127,11 +122,16 @@ The following container images are outdated.
   {{ end }}
   {{ end }}
 </table>
+`
+var emailUserDefaultPrefixContent = `<p>
+The following container images are outdated.
+</p>
 <p>
+</p>
+`
+var emailUserDefaultSuffixContent = `<p>
 </p>
 <p>
 Please update or rebuild your application immediatly.
 </p>
-</body>
-</html>
 `

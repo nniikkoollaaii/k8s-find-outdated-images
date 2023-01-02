@@ -80,13 +80,38 @@ var resultFormatGroupByEmailFlag = cli.BoolFlag{
 	Usage: "groups the findings by email in the json output format (only applicable to the json output)",
 }
 
-var sendEmailFlag = cli.BoolFlag{
+var sendEmailUserFlag = cli.BoolFlag{
 	Name:  "sendEmail",
 	Usage: "when set, send email notification with findings to email recipients found on the namespace metadata configured by the --email flag",
+}
+var emailUserContentPrefixFilePathFlag = cli.StringFlag{
+	Name:     "emailUserContentPrefixFilePath",
+	Usage:    "Path to a file containing html code to be inserted before the reult table in the user facing email notification",
+	Required: false,
+}
+var emailUserContentSuffixFilePathFlag = cli.StringFlag{
+	Name:     "emailUserContentSuffixFilePath",
+	Usage:    "Path to a file containing html code to be inserted after the reult table in the user facing email notification",
+	Required: false,
 }
 var sendAdminEmailFlag = cli.BoolFlag{
 	Name:  "sendAdminEmail",
 	Usage: "when set, send Admin email notification with findings to email recipients found on the namespace metadata configured by the --email flag",
+}
+var emailAdminAdress = cli.StringFlag{
+	Name:     "emailAdminAddress",
+	Usage:    "Email-Adress to send to the Admin report",
+	Required: false,
+}
+var emailAdminContentPrefixFilePathFlag = cli.StringFlag{
+	Name:     "emailAdminContentPrefixFilePath",
+	Usage:    "Path to a file containing html code to be inserted before the reult table in the admin email notification",
+	Required: false,
+}
+var emailAdminContentSuffixFilePathFlag = cli.StringFlag{
+	Name:     "emailAdminContentSuffixFilePath",
+	Usage:    "Path to a file containing html code to be inserted after the reult table in the admin email notification",
+	Required: false,
 }
 var smtpSenderAddressFlag = cli.StringFlag{
 	Name:     "smtpSenderAddress",
@@ -108,11 +133,6 @@ var smtpPasswordFlag = cli.StringFlag{
 var smtpServerAddressFlag = cli.StringFlag{
 	Name:     "smtpAddress",
 	Usage:    "Adress of the SMTP server (expected format is host:port)",
-	Required: false,
-}
-var emailAdminAdress = cli.StringFlag{
-	Name:     "emailAdminAddress",
-	Usage:    "Email-Adress to send to the Admin report",
 	Required: false,
 }
 
@@ -146,13 +166,17 @@ func main() {
 					&resultFileNameFlag,
 					&resultFileFormatFlag,
 					&resultFormatGroupByEmailFlag,
-					&sendEmailFlag,
+					&sendEmailUserFlag,
+					&emailUserContentPrefixFilePathFlag,
+					&emailUserContentSuffixFilePathFlag,
 					&sendAdminEmailFlag,
+					&emailAdminContentPrefixFilePathFlag,
+					&emailAdminContentSuffixFilePathFlag,
+					&emailAdminAdress,
 					&smtpSenderAddressFlag,
 					&smtpUsernameFlag,
 					&smtpPasswordFlag,
 					&smtpServerAddressFlag,
-					&emailAdminAdress,
 				},
 				Action: func(c *cli.Context) error {
 					return findOutdatedImages(c)

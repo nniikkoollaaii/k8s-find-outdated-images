@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"os"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -34,3 +37,32 @@ func buildMessage(mail Mail) string {
 
 	return msg
 }
+
+func addEmailContentOrDefault(filePathFlagValue string, defaultText string, emailBodyContent *bytes.Buffer) {
+	if filePathFlagValue != "" {
+		fileContent, err := os.ReadFile(filePathFlagValue)
+		if err != nil {
+			log.Error("Error reading file configured in flag", err)
+		}
+		emailBodyContent.Write(fileContent)
+	} else {
+		emailBodyContent.WriteString(defaultText)
+	}
+}
+
+var emailHTMLHeader = `<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+</style>
+</head>
+`
