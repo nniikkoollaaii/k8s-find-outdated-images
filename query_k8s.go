@@ -72,7 +72,7 @@ func getNamespaceData(emailNamespaceAnnotationFlagValue string, namespaces map[s
 
 		if isFlagSet(emailNamespaceAnnotationFlagValue) {
 			email := namespaceData.Annotations[emailNamespaceAnnotationFlagValue]
-			log.Debugf("Notification data email \"%s\" for namespace %s", email, namespaceName)
+			log.Debugf("Notification data email '%s' for namespace '%s'", email, namespaceName)
 			notificationData.Email = email
 		}
 
@@ -89,7 +89,7 @@ func getImages(allImages *map[string]ImageData, namespaces *map[string]*Notifica
 		if err != nil {
 			panic(err.Error())
 		}
-		log.Debugf("There are %d pods in the namespace %s", len(pods.Items), namespace)
+		log.Debugf("There are %d pods in the namespace '%s'", len(pods.Items), namespace)
 
 		//iterate over all pods and their images and add to result set
 		parsePods(allImages, namespaces, pods)
@@ -141,13 +141,13 @@ func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) ma
 				if value == filterFlagAnnotationValue {
 					// then add the namespace object to the global map
 					result[namespace.Name] = namespace
-					log.Debugf("Namespace %s contains annotation with key %s and value %s", namespace.Name, filterFlagAnnotationKey, filterFlagAnnotationValue)
+					log.Debugf("Namespace '%s' contains annotation with key '%s' and value '%s'", namespace.Name, filterFlagAnnotationKey, filterFlagAnnotationValue)
 				} else {
 					// do nothing
-					log.Debugf("Namespace %s contains annotation with key %s but value isn't equals", namespace.Name, filterFlagAnnotationKey)
+					log.Debugf("Namespace '%s' contains annotation with key '%s' but value isn't equals", namespace.Name, filterFlagAnnotationKey)
 				}
 			} else {
-				log.Debugf("Namespace %s doesn't contain a annotation with key %s", namespace.Name, filterFlagAnnotationKey)
+				log.Debugf("Namespace '%s' doesn't contain a annotation with key '%s'", namespace.Name, filterFlagAnnotationKey)
 			}
 
 		}
@@ -163,14 +163,14 @@ func parsePods(allImages *map[string]ImageData, namespaces *map[string]*Notifica
 		//first the initContainers array
 		initContainers := pod.Spec.InitContainers
 		for _, initContainer := range initContainers {
-			log.Debugf("Found image %s in pod %s in namespace %s", initContainer.Image, pod.Name, pod.Namespace)
+			log.Debugf("Found image '%s' in pod '%s' in namespace '%s'", initContainer.Image, pod.Name, pod.Namespace)
 			addImageData(initContainer.Image, pod.Name, pod.Namespace, allImages, namespaces)
 		}
 
 		// second the containers array
 		containers := pod.Spec.Containers
 		for _, container := range containers {
-			log.Debugf("Found image %s in pod %s in namespace %s", container.Image, pod.Name, pod.Namespace)
+			log.Debugf("Found image '%s' in pod '%s' in namespace '%s'", container.Image, pod.Name, pod.Namespace)
 			addImageData(container.Image, pod.Name, pod.Namespace, allImages, namespaces)
 		}
 	}

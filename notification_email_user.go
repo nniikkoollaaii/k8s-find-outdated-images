@@ -25,7 +25,7 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 	_, err = mail.ParseAddress(from)
 	if err != nil {
 		//log error
-		log.Errorf("Value of Sender Email Adress \"%s\" is not a valid email address", from)
+		log.Errorf("Value of Sender Email Adress '%s' is not a valid email address", from)
 		//exit programm
 		cli.Exit("Value of Sender Email Adress is not a valid email address", 1)
 	}
@@ -40,7 +40,7 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 		if err != nil {
 			//skip this address
 			//log error
-			log.Errorf("Value from Namespace Annotation for contact email address \"%s\" is not a valid email address", recipient)
+			log.Errorf("Value from Namespace Annotation for contact email address '%s' is not a valid email address", recipient)
 			//exit programm
 			cli.Exit("Value from Namespace Annotation for contact email address is not a valid email address", 1)
 
@@ -71,7 +71,7 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 			log.Error("Error sending User report via email", err)
 			//cli.Exit("Error sending User report via email", 1)
 		} else {
-			log.Debugf("Successful sent User email to %s via %s", request.To[0], ctx.String(smtpServerAddressFlag.Name))
+			log.Debugf("Successful sent User email to '%s' via '%s'", request.To[0], ctx.String(smtpServerAddressFlag.Name))
 		}
 	}
 }

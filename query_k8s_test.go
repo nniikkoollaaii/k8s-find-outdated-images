@@ -150,13 +150,13 @@ func TestGetNamespaceData(t *testing.T) {
 	getNamespaceData(emailFlag, namespaces, &result)
 
 	if result["CorrectAnnotationNamespace"].Email != "email@domain.de" {
-		t.Fatalf("Expected email set for namespace %s", "CorrectAnnotationNamespace")
+		t.Fatalf("Expected email set for namespace '%s'", "CorrectAnnotationNamespace")
 	}
 	if result["WrongAnnotationNamespace"].Email != "" {
-		t.Fatalf("Expected no email set for namespace %s", "WrongAnnotationNamespace")
+		t.Fatalf("Expected no email set for namespace '%s'", "WrongAnnotationNamespace")
 	}
 	if result["NoAnnotationNamespace"].Email != "" {
-		t.Fatalf("Expected no email set for namespace %s", "NoAnnotationNamespace")
+		t.Fatalf("Expected no email set for namespace '%s'", "NoAnnotationNamespace")
 	}
 }
 
@@ -253,32 +253,32 @@ func TestImageDataFromK8sAPI(t *testing.T) {
 		t.Fatalf("Wrong number of detected images: %d expected but got %d", 8, len(allImages))
 	}
 	if len(allImages["my.domain.com/container1:v1"].Findings) != 1 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/container1:v1", 1, len(allImages["my.domain.com/container1:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/container1:v1", 1, len(allImages["my.domain.com/container1:v1"].Findings))
 	}
 	data1 := *(allImages["my.domain.com/container1:v1"].Findings[0].NotificationData)
 	if data1.Email != "test@domain.com" {
 		t.Fatalf("NotifcationData email isn't expected value")
 	}
 	if len(allImages["my.domain.com/container2:v1"].Findings) != 2 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/container2:v1", 2, len(allImages["my.domain.com/container2:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/container2:v1", 2, len(allImages["my.domain.com/container2:v1"].Findings))
 	}
 	if len(allImages["my.domain.com/container3:v1"].Findings) != 2 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/container3:v1", 2, len(allImages["my.domain.com/container3:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/container3:v1", 2, len(allImages["my.domain.com/container3:v1"].Findings))
 	}
 	if len(allImages["my.domain.com/container4:v1"].Findings) != 1 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/container4:v1", 1, len(allImages["my.domain.com/container4:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/container4:v1", 1, len(allImages["my.domain.com/container4:v1"].Findings))
 	}
 	if len(allImages["my.domain.com/initcontainer1:v1"].Findings) != 1 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/initcontainer1:v1", 1, len(allImages["my.domain.com/initcontainer1:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/initcontainer1:v1", 1, len(allImages["my.domain.com/initcontainer1:v1"].Findings))
 	}
 	if len(allImages["my.domain.com/initcontainer2:v1"].Findings) != 2 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/initcontainer2:v1", 2, len(allImages["my.domain.com/initcontainer2:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/initcontainer2:v1", 2, len(allImages["my.domain.com/initcontainer2:v1"].Findings))
 	}
 	if len(allImages["my.domain.com/initcontainer3:v1"].Findings) != 2 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/initcontainer3:v1", 2, len(allImages["my.domain.com/initcontainer3:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/initcontainer3:v1", 2, len(allImages["my.domain.com/initcontainer3:v1"].Findings))
 	}
 	if len(allImages["my.domain.com/initcontainer4:v1"].Findings) != 1 {
-		t.Fatalf("Wrong number of findings for image %s: %d expected but got %d", "my.domain.com/initcontainer4:v1", 1, len(allImages["my.domain.com/initcontainer4:v1"].Findings))
+		t.Fatalf("Wrong number of findings for image '%s': %d expected but got %d", "my.domain.com/initcontainer4:v1", 1, len(allImages["my.domain.com/initcontainer4:v1"].Findings))
 	}
 }
 

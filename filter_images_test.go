@@ -24,7 +24,7 @@ func TestFilterImages(t *testing.T) {
 	}
 	_, exists := testImages["my.domain.com/outdated:1.0.0"]
 	if !exists {
-		t.Fatalf("Expected image %s is missing", "my.domain.com/outdated:1.0.0")
+		t.Fatalf("Expected image '%s' is missing", "my.domain.com/outdated:1.0.0")
 	}
 
 }

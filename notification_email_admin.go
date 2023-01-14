@@ -23,7 +23,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	if err != nil {
 		//do not send when recipient email address is invalid
 		//log error
-		log.Fatalf("Value of Admin Email Adress \"%s\" is not a valid email address", to)
+		log.Fatalf("Value of Admin Email Adress '%s' is not a valid email address", to)
 		//exit programm
 		cli.Exit("Value of Admin Email Adress is not a valid email address", 1)
 	}
@@ -33,7 +33,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	_, err = mail.ParseAddress(from)
 	if err != nil {
 		//log error
-		log.Fatalf("Value of Sender Email Adress \"%s\" is not a valid email address", to)
+		log.Fatalf("Value of Sender Email Adress '%s' is not a valid email address", to)
 		//exit programm
 		cli.Exit("Value of Sender Email Adress is not a valid email address", 1)
 	}
@@ -43,7 +43,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	request := Mail{
 		Sender:  from,
 		To:      []string{to},
-		Subject: fmt.Sprintf("Outdated container images older than %s in use [Admin Report]", ctx.String(ageFlag.Name)),
+		Subject: fmt.Sprintf("Outdated container images older than '%s' in use [Admin Report]", ctx.String(ageFlag.Name)),
 		Body:    emailBodyContent.Bytes(),
 	}
 
@@ -63,7 +63,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 		log.Error("Error sending admin report via email", err)
 		//cli.Exit("Error sending admin report via email", 1)
 	} else {
-		log.Debugf("Successful sent Admin email to %s via %s", request.To[0], ctx.String(smtpServerAddressFlag.Name))
+		log.Debugf("Successful sent Admin email to '%s' via '%s'", request.To[0], ctx.String(smtpServerAddressFlag.Name))
 	}
 }
 

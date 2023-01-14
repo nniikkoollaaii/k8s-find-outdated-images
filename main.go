@@ -203,7 +203,7 @@ func findOutdatedImages(ctx *cli.Context) error {
 	var k8sclient = getK8sClient(ctx)
 	allowedAge, err := str2duration.ParseDuration(ctx.String(ageFlag.Name))
 	if err != nil {
-		log.Errorf("Cannot parse allowed age from \"%s\" for flag \"--%s\"", ctx.String(ageFlag.Name), ageFlag.Name)
+		log.Errorf("Cannot parse allowed age from '%s' for flag '--%s'", ctx.String(ageFlag.Name), ageFlag.Name)
 	}
 	oldestAllowedTimestamp := time.Now().Add(-allowedAge)
 
