@@ -133,6 +133,8 @@ func filterNamespaces(filterFlag string, allNamespaces *corev1.NamespaceList) ma
 				if filterFlagAnnotationValue == "" {
 					// then add the namespace object to the global map
 					result[namespace.Name] = namespace
+					//and go to next namespace (or next iteration of loop)
+					continue
 				}
 
 				// and the value of the annotation is equal the value specified
