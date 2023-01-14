@@ -28,7 +28,13 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 	// https://github.com/google/go-containerregistry/blob/main/pkg/authn/README.md
 	descriptor, err := remote.Get(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
 	if err != nil {
-		panic(err)
+
+		//ToDo: How to differentiate between different failure states?
+		//When the error is returned because the Image ref does not exist -> only log a warning
+		log.Warn(err)
+		//When the error is returned because of a AuthN problem -> the tool should exit ...
+		//panic(err)
+		//Room for improvement here
 	}
 
 	img, err := descriptor.Image() // using amd64/linux as default platform
@@ -40,7 +46,7 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 		panic(err)
 	}
 
-	log.Debugf("Build timestamp for image %s: %s", image, configFile.Created.Time)
+	log.Debugf("Build timestamp for image '%s': '%s'", image, configFile.Created.Time)
 
 	return configFile.Created.Time
 
