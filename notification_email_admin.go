@@ -43,7 +43,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	request := Mail{
 		Sender:  from,
 		To:      []string{to},
-		Subject: fmt.Sprintf("Outdated container images older than '%s' in use [Admin Report]", ctx.String(ageFlag.Name)),
+		Subject: fmt.Sprintf("Outdated container images older than %s in use [Admin Report]", ctx.String(ageFlag.Name)),
 		Body:    emailBodyContent.Bytes(),
 	}
 
