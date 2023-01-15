@@ -30,8 +30,14 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 	if err != nil {
 
 		//ToDo: How to differentiate between different failure states?
+
 		//When the error is returned because the Image ref does not exist -> only log a warning
 		log.Warn(err)
+		//Case 1: The pod is in Pending state because of wrong image reference (image does simply not exist because not built or pushed yet)
+		//Case 2: The image in the pod is so old it does not exist in the registry anymore (because of housekeeping or something like this)
+		// -> so assume this Image is outdated
+		return time.Time{}
+
 		//When the error is returned because of a AuthN problem -> the tool should exit ...
 		//panic(err)
 		//Room for improvement here
@@ -46,7 +52,7 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 		panic(err)
 	}
 
-	log.Debugf("Build timestamp for image '%s': '%s'", image, configFile.Created.Time)
+	log.Debugf("Build timestamp for image '%s' is '%s'", image, configFile.Created.Time)
 
 	return configFile.Created.Time
 
