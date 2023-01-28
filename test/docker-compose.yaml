@@ -6,7 +6,7 @@ services:
       MH_AUTH_FILE: /tmp/mailhog.authn
     volumes:
       - type: bind
-        source: mailhog.authn
+        source: ./test/mailhog.authn
         target: /tmp/mailhog.authn
     logging:
       driver: 'none'  # disable saving logs
