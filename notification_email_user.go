@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"net/mail"
-	"net/smtp"
 	"text/template"
 
 	log "github.com/sirupsen/logrus"
@@ -58,14 +57,12 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 		msg := buildMessage(request)
 
 		// send email
-		auth := smtp.PlainAuth(
-			"",
+		err = sendEmail(
 			ctx.String(smtpUsernameFlag.Name),
 			ctx.String(smtpPasswordFlag.Name),
-			getHostForSMTPAdress(ctx.String(smtpServerAddressFlag.Name)),
-		)
-
-		err = smtp.SendMail(ctx.String(smtpServerAddressFlag.Name), auth, request.Sender, request.To, []byte(msg))
+			ctx.String(smtpServerAddressFlag.Name),
+			&request,
+			msg)
 
 		if err != nil {
 			log.Error("Error sending User report via email", err)

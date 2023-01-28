@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net/smtp"
 	"os"
 	"strings"
 
@@ -26,6 +27,11 @@ func getHostForSMTPAdress(address string) string {
 	}
 
 	return host
+}
+
+func sendEmail(username string, password string, smtpServerAddress string, request *Mail, msg string) error {
+	auth := LoginAuth(username, password)
+	return smtp.SendMail(smtpServerAddress, auth, request.Sender, request.To, []byte(msg))
 }
 
 func buildMessage(mail Mail) string {

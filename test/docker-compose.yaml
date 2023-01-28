@@ -2,6 +2,12 @@ version: "3.3"
 services:
   mailhog:
     image: mailhog/mailhog
+    # environment:
+    #   MH_AUTH_FILE: /tmp/mailhog.authn
+    # volumes:
+    #   - type: bind
+    #     source: ./mailhog.authn
+    #     target: /tmp/mailhog.authn
     logging:
       driver: 'none'  # disable saving logs
     ports:
