@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
+func sendEmailUserNotifications(images *map[string]ImageData, ctx *cli.Context) {
 	//check that --sendEmail flag is send and user want to send emails. If not return early.
 	if !ctx.Bool(sendEmailUserFlag.Name) {
 		return
@@ -30,7 +30,7 @@ func sendEmailNotifications(images *map[string]ImageData, ctx *cli.Context) {
 	}
 
 	//reorganize result data to loop over and send emails
-	result := groupFindingsByEmail(images)
+	result := generateNotificationDataModel(images)
 
 	for recipient, outdatedImages := range result.Notifications {
 
@@ -112,7 +112,7 @@ var emailUserNotificationTemplate = `<table>
   {{ range $resultContentData.Findings }}
   <tr>
     <td>{{ $image }}</td>
-    <td>{{ $resultContentData.BuildTimestamp.Format "02 Jan 06 15:04 UTC" }}</td>
+    <td>{{ $resultContentData.BuildTimestamp }}</td>
     <td>{{ .Namespace }}</td>
     <td>{{ .PodName }}</td>
   </tr>

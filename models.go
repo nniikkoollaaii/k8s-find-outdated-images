@@ -34,7 +34,7 @@ type ResultGroupedByEmailOutdatedImages struct {
 	Images map[string]ResultContentData
 }
 type ResultContentData struct {
-	BuildTimestamp time.Time
+	BuildTimestamp string
 	Findings       []ResultContentFindingData
 }
 

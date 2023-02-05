@@ -12,7 +12,7 @@ func TestEmailUserTemplating(t *testing.T) {
 	tmp := ResultGroupedByEmailOutdatedImages{
 		Images: map[string]ResultContentData{
 			"my.domain.com/image:v1": {
-				BuildTimestamp: fakeBuildTimestamp,
+				BuildTimestamp: getUserStringForBuildTimestamp(fakeBuildTimestamp),
 				Findings: []ResultContentFindingData{
 					{
 						Namespace: "test",
@@ -25,7 +25,7 @@ func TestEmailUserTemplating(t *testing.T) {
 				},
 			},
 			"my.domain.com/image2:v1": {
-				BuildTimestamp: fakeBuildTimestamp,
+				BuildTimestamp: getUserStringForBuildTimestamp(fakeBuildTimestamp),
 				Findings: []ResultContentFindingData{
 					{
 						Namespace: "test3",
@@ -73,7 +73,7 @@ The following container images are outdated.
   
   <tr>
     <td>my.domain.com/image2:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test3</td>
     <td>testpod3</td>
   </tr>
@@ -82,14 +82,14 @@ The following container images are outdated.
   
   <tr>
     <td>my.domain.com/image:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test</td>
     <td>testpod</td>
   </tr>
   
   <tr>
     <td>my.domain.com/image:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test2</td>
     <td>testpod2</td>
   </tr>
@@ -117,7 +117,7 @@ func TestEmailUserTemplatingCustomPrefixAndSuffixInContent(t *testing.T) {
 	tmp := ResultGroupedByEmailOutdatedImages{
 		Images: map[string]ResultContentData{
 			"my.domain.com/image:v1": {
-				BuildTimestamp: fakeBuildTimestamp,
+				BuildTimestamp: getUserStringForBuildTimestamp(fakeBuildTimestamp),
 				Findings: []ResultContentFindingData{
 					{
 						Namespace: "test",
@@ -163,7 +163,7 @@ Test Prefix
   
   <tr>
     <td>my.domain.com/image:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test</td>
     <td>testpod</td>
   </tr>

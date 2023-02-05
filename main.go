@@ -226,6 +226,6 @@ func findOutdatedImages(ctx *cli.Context) error {
 
 	//5. Step: Send notifications
 	sendEmailAdminNotification(&images, ctx)
-	sendEmailNotifications(&images, ctx)
+	sendEmailUserNotifications(&images, ctx)
 	return nil
 }

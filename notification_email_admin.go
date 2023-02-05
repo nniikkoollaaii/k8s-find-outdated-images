@@ -37,8 +37,10 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 		cli.Exit("Value of Sender Email Adress is not a valid email address", 1)
 	}
 
+	result := generateNotificationDataModel(images)
+
 	// build email content
-	emailBodyContent := templateAdminEmailBodyContent(*images, ctx.String(emailAdminContentPrefixFilePathFlag.Name), ctx.String(emailAdminContentSuffixFilePathFlag.Name))
+	emailBodyContent := templateAdminEmailBodyContent(result, ctx.String(emailAdminContentPrefixFilePathFlag.Name), ctx.String(emailAdminContentSuffixFilePathFlag.Name))
 	request := Mail{
 		Sender:  from,
 		To:      []string{to},
@@ -64,7 +66,7 @@ func sendEmailAdminNotification(images *map[string]ImageData, ctx *cli.Context) 
 	}
 }
 
-func templateAdminEmailBodyContent(outdatedImages map[string]ImageData, prefixContentFlagValue string, suffixContentFlagValue string) bytes.Buffer {
+func templateAdminEmailBodyContent(outdatedImages ResultGroupedByEmail, prefixContentFlagValue string, suffixContentFlagValue string) bytes.Buffer {
 	tmpl := template.Must(template.New("emailAdminNotificationTemplate").Parse(emailAdminNotificationTemplate))
 	var emailBodyContent bytes.Buffer
 
@@ -99,14 +101,16 @@ var emailAdminNotificationTemplate = `<table>
     <th>Namespace</th>
     <th>PodName</th>
   </tr>
-  {{ range $image, $imageData := .}}
-  {{ range $imageData.Findings }}
+  {{ range $email, $resultGroupedByEmailOutdatedImages := .Notifications}}
+  {{ range $image, $resultContentData := $resultGroupedByEmailOutdatedImages.Images}}
+  {{ range $resultContentData.Findings }}
   <tr>
     <td>{{ $image }}</td>
-    <td>{{ $imageData.BuildTimestamp.Format "02 Jan 06 15:04 UTC" }}</td>
+    <td>{{ $resultContentData.BuildTimestamp }}</td>
     <td>{{ .Namespace }}</td>
     <td>{{ .PodName }}</td>
   </tr>
+  {{ end }}
   {{ end }}
   {{ end }}
 </table>

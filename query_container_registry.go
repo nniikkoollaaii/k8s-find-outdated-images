@@ -36,7 +36,7 @@ func getImageCreatedTimestampForImage(image string) time.Time {
 		//Case 1: The pod is in Pending state because of wrong image reference (image does simply not exist because not built or pushed yet)
 		//Case 2: The image in the pod is so old it does not exist in the registry anymore (because of housekeeping or something like this)
 		// -> so assume this Image is outdated
-		return time.Time{}
+		return time.Time{} // 0001-01-01 00:00:00 +0000 UTC
 
 		//When the error is returned because of a AuthN problem -> the tool should exit ...
 		//panic(err)

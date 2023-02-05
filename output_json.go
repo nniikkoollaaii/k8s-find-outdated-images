@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -32,7 +33,7 @@ func outputJsonResult(images *map[string]ImageData, ctx *cli.Context) {
 func getJson(images *map[string]ImageData) ([]byte, error) {
 	return json.MarshalIndent(images, "", " ")
 }
-func groupFindingsByEmail(images *map[string]ImageData) ResultGroupedByEmail {
+func generateNotificationDataModel(images *map[string]ImageData) ResultGroupedByEmail {
 	var result ResultGroupedByEmail
 	result.Notifications = make(map[string]ResultGroupedByEmailOutdatedImages)
 
@@ -46,7 +47,7 @@ func groupFindingsByEmail(images *map[string]ImageData) ResultGroupedByEmail {
 
 				images := make(map[string]ResultContentData)
 				images[imageName] = ResultContentData{
-					BuildTimestamp: imageData.BuildTimestamp,
+					BuildTimestamp: getUserStringForBuildTimestamp(imageData.BuildTimestamp),
 					Findings: []ResultContentFindingData{
 						{
 							Namespace: finding.Namespace,
@@ -65,7 +66,7 @@ func groupFindingsByEmail(images *map[string]ImageData) ResultGroupedByEmail {
 
 					// add new image to result with first finding
 					resultForEmail.Images[imageName] = ResultContentData{
-						BuildTimestamp: imageData.BuildTimestamp,
+						BuildTimestamp: getUserStringForBuildTimestamp(imageData.BuildTimestamp),
 						Findings: []ResultContentFindingData{
 							{
 								Namespace: finding.Namespace,
@@ -88,7 +89,17 @@ func groupFindingsByEmail(images *map[string]ImageData) ResultGroupedByEmail {
 	return result
 }
 
+// convert the image build timestamp to a understandable information for the end user
+func getUserStringForBuildTimestamp(timestamp time.Time) string {
+
+	if (timestamp.Equal(time.Time{})) {
+		return "UNKOWN"
+	}
+
+	return timestamp.Format(time.RFC3339)
+}
+
 func getJsonGroupedByEmail(images *map[string]ImageData) ([]byte, error) {
-	result := groupFindingsByEmail(images)
+	result := generateNotificationDataModel(images)
 	return json.MarshalIndent(result, "", " ")
 }

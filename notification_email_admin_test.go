@@ -12,36 +12,39 @@ func TestEmailAdminTemplating(t *testing.T) {
 	layout := "2006-01-02T15:04:05.000Z"
 	fakeBuildTimestamp, _ := time.Parse(layout, "2022-12-31T13:10:00.000Z")
 
-	images := make(map[string]ImageData)
-	images["my.domain.com/image:v1"] = ImageData{
-		Image:          "my.domain.com/image:v1",
-		BuildTimestamp: fakeBuildTimestamp,
-		Findings: []FindingData{
-			{
-				Namespace:        "test",
-				PodName:          "testpod",
-				NotificationData: &notificationData,
-			},
-			{
-				Namespace:        "test2",
-				PodName:          "testpod2",
-				NotificationData: &notificationData,
-			},
-		},
-	}
-	images["my.domain.com/image2:v1"] = ImageData{
-		Image:          "my.domain.com/image2:v1",
-		BuildTimestamp: fakeBuildTimestamp,
-		Findings: []FindingData{
-			{
-				Namespace:        "test3",
-				PodName:          "testpod3",
-				NotificationData: &notificationData,
+	testData := ResultGroupedByEmail{
+		Notifications: map[string]ResultGroupedByEmailOutdatedImages{
+			"test@test.com": ResultGroupedByEmailOutdatedImages{
+				Images: map[string]ResultContentData{
+					"my.domain.com/image:v1": {
+						BuildTimestamp: getUserStringForBuildTimestamp(fakeBuildTimestamp),
+						Findings: []ResultContentFindingData{
+							{
+								Namespace: "test",
+								PodName:   "testpod",
+							},
+							{
+								Namespace: "test2",
+								PodName:   "testpod2",
+							},
+						},
+					},
+					"my.domain.com/image2:v1": {
+						BuildTimestamp: getUserStringForBuildTimestamp(fakeBuildTimestamp),
+						Findings: []ResultContentFindingData{
+							{
+								Namespace: "test3",
+								PodName:   "testpod3",
+							},
+						},
+					},
+				},
 			},
 		},
 	}
 
-	result := templateAdminEmailBodyContent(images, "", "")
+	result := templateAdminEmailBodyContent(testData, "", "")
+	//log.Println(result.String())
 
 	expectedResult := `
 <html>
@@ -75,9 +78,10 @@ The following container images are outdated.
   </tr>
   
   
+  
   <tr>
     <td>my.domain.com/image2:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test3</td>
     <td>testpod3</td>
   </tr>
@@ -86,17 +90,18 @@ The following container images are outdated.
   
   <tr>
     <td>my.domain.com/image:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test</td>
     <td>testpod</td>
   </tr>
   
   <tr>
     <td>my.domain.com/image:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test2</td>
     <td>testpod2</td>
   </tr>
+  
   
   
 </table>
@@ -116,20 +121,25 @@ func TestEmailAdminTemplatingCustomPrefixAndSuffixInContent(t *testing.T) {
 	layout := "2006-01-02T15:04:05.000Z"
 	fakeBuildTimestamp, _ := time.Parse(layout, "2022-12-31T13:10:00.000Z")
 
-	images := make(map[string]ImageData)
-	images["my.domain.com/image:v1"] = ImageData{
-		Image:          "my.domain.com/image:v1",
-		BuildTimestamp: fakeBuildTimestamp,
-		Findings: []FindingData{
-			{
-				Namespace:        "test",
-				PodName:          "testpod",
-				NotificationData: &notificationData,
+	testData := ResultGroupedByEmail{
+		Notifications: map[string]ResultGroupedByEmailOutdatedImages{
+			"test@test.com": ResultGroupedByEmailOutdatedImages{
+				Images: map[string]ResultContentData{
+					"my.domain.com/image:v1": {
+						BuildTimestamp: getUserStringForBuildTimestamp(fakeBuildTimestamp),
+						Findings: []ResultContentFindingData{
+							{
+								Namespace: "test",
+								PodName:   "testpod",
+							},
+						},
+					},
+				},
 			},
 		},
 	}
 
-	result := templateAdminEmailBodyContent(images, "./test/email_content_prefix.tpl", "./test/email_content_suffix.tpl")
+	result := templateAdminEmailBodyContent(testData, "./test/email_content_prefix.tpl", "./test/email_content_suffix.tpl")
 
 	expectedResult := `
 <html>
@@ -161,12 +171,14 @@ Test Prefix
   </tr>
   
   
+  
   <tr>
     <td>my.domain.com/image:v1</td>
-    <td>31 Dec 22 13:10 UTC</td>
+    <td>2022-12-31T13:10:00Z</td>
     <td>test</td>
     <td>testpod</td>
   </tr>
+  
   
   
 </table>
